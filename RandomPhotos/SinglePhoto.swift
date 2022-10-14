@@ -10,55 +10,60 @@ import UIKit
 class SinglePhoto: UIViewController, UIScrollViewDelegate {
     
     var selectedImage: Data?
-    var imageView = UIImageView()
+    var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
+        return imageView
+    }()
+    
     var scrollView = UIScrollView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(systemItem: .save)
         view.backgroundColor = .systemBackground
+        navigationController?.navigationBar.prefersLargeTitles = false
         
+        view.addSubview(scrollView)
         scrollView.frame = view.bounds
         scrollView.delegate = self
-        scrollView.maximumZoomScale = 10.0
-        scrollView.minimumZoomScale = 1.0
+//        scrollView.backgroundColor = .systemBlue
         scrollView.layer.cornerRadius = 5
-        view.addSubview(scrollView)
-        
+        scrollView.minimumZoomScale = 1
+        scrollView.maximumZoomScale = 10
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-           scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-           scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
-           scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-           scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
         ])
-        
-        imageView.frame = scrollView.bounds
-        imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = .systemBlue
+
+
         if let data = selectedImage {
             imageView.image = UIImage(data: data)
         }
         scrollView.addSubview(imageView)
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            imageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-        ])
-    }
-    
-    func addGesture() {
-        let gesture = UIPinchGestureRecognizer(target: self, action: #selector(didPinch))
-    }
-    
-    @objc func didPinch(gesture: UIPinchGestureRecognizer) {
-        
+        imageView.frame = scrollView.bounds
+        imageView.center = scrollView.center
+                                        
+        addGesture()
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return self.imageView
+        return imageView
+    }
+    
+    func addGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
+        scrollView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func handleDoubleTap(gesture: UITapGestureRecognizer) {
+        guard let view = gesture.view as? UIScrollView else { return }
+        if view.zoomScale > view.minimumZoomScale {
+            view.setZoomScale(view.minimumZoomScale, animated: true)
+        }
     }
 }

@@ -103,7 +103,10 @@ extension ViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        configureContextMenu(index: indexPaths[0].row)
+        for indexPath in indexPaths {
+            return configureContextMenu(index: indexPath.row)
+        }
+        return UIContextMenuConfiguration()
     }
     
     func configureContextMenu(index: Int) -> UIContextMenuConfiguration? {
