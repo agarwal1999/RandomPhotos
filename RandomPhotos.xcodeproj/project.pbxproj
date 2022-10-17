@@ -63,12 +63,12 @@
 				56D4B04E28F5783C00AA6961 /* AppDelegate.swift */,
 				56D4B05028F5783C00AA6961 /* SceneDelegate.swift */,
 				56D4B05228F5783C00AA6961 /* ViewController.swift */,
+				565F2C7928F7D04A00D0E039 /* FooterReusableView.swift */,
+				565F2C7728F6E9F300D0E039 /* SinglePhoto.swift */,
 				56D4B06228F57A5400AA6961 /* ImageCell.swift */,
 				56D4B05728F5783D00AA6961 /* Assets.xcassets */,
 				56D4B05928F5783D00AA6961 /* LaunchScreen.storyboard */,
 				56D4B05C28F5783D00AA6961 /* Info.plist */,
-				565F2C7728F6E9F300D0E039 /* SinglePhoto.swift */,
-				565F2C7928F7D04A00D0E039 /* FooterReusableView.swift */,
 			);
 			path = RandomPhotos;
 			sourceTree = "<group>";

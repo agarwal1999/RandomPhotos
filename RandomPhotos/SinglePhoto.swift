@@ -32,6 +32,7 @@ class SinglePhoto: UIViewController, UIScrollViewDelegate {
         scrollView.layer.cornerRadius = 5
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = 10
+//        scrollView.isScrollEnabled = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -39,7 +40,6 @@ class SinglePhoto: UIViewController, UIScrollViewDelegate {
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
         ])
-
 
         if let data = selectedImage {
             imageView.image = UIImage(data: data)

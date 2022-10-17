@@ -14,7 +14,6 @@ class ViewController: UIViewController {
     private var collectionView: UICollectionView?
     private var photos: [Data] = []
     private var isLoading = false
-    var counter = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,13 +21,7 @@ class ViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .systemBackground
         
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumInteritemSpacing = 3
-        layout.minimumLineSpacing = 4
-        layout.itemSize = CGSize(width: view.frame.size.width / 2 - 5 , height: view.frame.size.width / 2 - 5)
-        
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: AutoInvalidatingLayout())
         
         guard let collectionView = collectionView else { return }
         
@@ -45,6 +38,14 @@ class ViewController: UIViewController {
         
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+        ])
         
         fetchPhotos()
     }
@@ -115,7 +116,6 @@ extension ViewController: UICollectionViewDelegate {
                 guard let image = UIImage(data: self.photos[index]) else { return }
                 let vc = UIActivityViewController(activityItems: [image], applicationActivities: [])
                 self.present(vc, animated: true)
-                
             }
             return UIMenu(title: "Options", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [edit])
         }
@@ -148,6 +148,45 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: view.safeAreaLayoutGuide.layoutFrame.width, height: 100)
+    }
+}
+
+class AutoInvalidatingLayout: UICollectionViewFlowLayout {
+    
+    func widestCellWidth(bounds: CGRect) -> CGFloat {
+        guard let collectionView = collectionView else {
+            return 0
+        }
+        let insets = collectionView.contentInset
+        let width = bounds.width - insets.left - insets.right
+        
+        if width < 0 { return 0 }
+        return width / 2 - 5
+    }
+    
+    func updateEstimatedItemSize(bounds: CGRect) {
+        estimatedItemSize =  CGSize(width: widestCellWidth(bounds: bounds), height: widestCellWidth(bounds: bounds))
+    }
+    
+    override func prepare() {
+        super.prepare()
+        
+        let bounds = collectionView?.bounds ?? .zero
+        updateEstimatedItemSize(bounds: bounds)
+        minimumInteritemSpacing = 3
+        minimumLineSpacing = 4
+    }
+    
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        guard let collectionView = collectionView else {
+            return false
+        }
+        let oldSize = collectionView.bounds.size
+        guard oldSize != newBounds.size else {
+            return false
+        }
+        updateEstimatedItemSize(bounds: newBounds)
+        return true
     }
 }
 
