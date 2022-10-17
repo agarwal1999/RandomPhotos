@@ -24,7 +24,7 @@ class SinglePhoto: UIViewController, UIScrollViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = false
-        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(handleSave))
         view.addSubview(scrollView)
         scrollView.frame = view.bounds
         scrollView.delegate = self
@@ -64,6 +64,23 @@ class SinglePhoto: UIViewController, UIScrollViewDelegate {
         guard let view = gesture.view as? UIScrollView else { return }
         if view.zoomScale > view.minimumZoomScale {
             view.setZoomScale(view.minimumZoomScale, animated: true)
+        }
+    }
+    
+    @objc func handleSave() {
+        guard let image = imageView.image else { return }
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            let ac = UIAlertController(title: "Save Error", message: error.localizedDescription, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        } else  {
+            let ac = UIAlertController(title: "Saved!", message: "This image has been saved to your photos", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
         }
     }
 }
